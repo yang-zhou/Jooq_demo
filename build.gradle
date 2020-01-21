@@ -1,0 +1,79 @@
+plugins {
+	id 'org.springframework.boot' version '2.2.4.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+	id 'java'
+	id 'nu.studer.jooq' version '4.0'
+}
+
+group = 'com.cy.info'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-jooq'
+	compileOnly 'org.projectlombok:lombok'
+	compileOnly 'mysql:mysql-connector-java'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+	
+	jooqRuntime 'mysql:mysql-connector-java:6.0.6'
+}
+
+test {
+	useJUnitPlatform()
+}
+
+jooq {
+  version = '3.12.3'
+  edition = 'OSS'
+  sample(sourceSets.main) {
+    jdbc {
+      driver = 'com.mysql.jdbc.Driver'
+      url = 'jdbc:mysql://122.51.255.98:3306/jooq_demo?useSSL=false&useUnicode=true&characterEncoding=UTF-8'
+      user = 'root'
+      password = 'mysqlyang'
+      properties {
+        property {
+          key = 'ssl'
+          value = 'false'
+        }
+      }
+    }
+    generator {
+      name = 'org.jooq.codegen.DefaultGenerator'
+      strategy {
+        name = 'org.jooq.codegen.DefaultGeneratorStrategy'
+      }
+      database {
+        name = 'org.jooq.meta.mysql.MySQLDatabase'
+        inputSchema = 'jooq_demo'
+      }
+      generate {
+        relations = true
+        deprecated = false
+        records = true
+        daos = true
+        immutablePojos = true
+        fluentSetters = true
+        // ...
+      }
+      target {
+        packageName = 'com.cy.info.jooq'
+        directory = 'src/main/java'
+      }
+    }
+  }
+}
